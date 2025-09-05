@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+    <style>code {
+  display: block;
+  white-space: pre-wrap   
+}</style>
 <h1>RO-Crate schema++</h1>
 
 <h2>Specification</h2>
@@ -26,17 +30,155 @@
 <h2>Use Cases</h2>
 <ul>
     <li>
-        Exchanging data between ELNs
-
+        Exchanging data between systems using a common format:
+    </li>
+    <li>
+        Semantic exchange of data: Sidestep the issue of !
     </li>
 
     <li>
-        Validation
+        Validation of imported data: Validate the data! Trust things more!
     </li>
 </ul>
 
 
 <h2>Quick Start Guide (Java)</h2>
+
+<p>In this example, we express two SQL tables in RO-Crate. It expresses experiments and each experiment can have a
+    creator, who is a person</p>
+<p><code>
+CREATE TABLE person( -- https://schema.org/Person
+    personid VARCHAR(255), 
+    givenname VARCHAR(255), -- https://schema.org/givenName
+    familyname VARCHAR(255), -- https://schema.org/familyName
+    identifier VARCHAR (255), -- https://schema.org/identifier
+    PRIMARY KEY(personid)
+
+
+);
+
+CREATE TABLE experiment(
+    experimentid VARCHAR(255), 
+    date DATETIME,
+    name VARCHAR(255),
+    creatorid VARCHAR(255), https://schema.org/creator
+    PRIMARY_KEY(experimentid),
+    FOREIGN KEY(creatorid) REFERENCES person(personid)
+);
+
+</code></p>
+<p>
+    Tables are Types in our nomenclature, e.g. <code>IType personType = new Type()</code>. Columns are PropertyTypes,
+    e.g. <code>IPropertyType name = new PropertyType()</code>. Both Types and PropertyTypes can be annotated to specify
+    semantics. The metadata entries are represented by IMetaDataEntry, their <code>@type</code> is an IType specifed in the crate.
+    The above example looks like this. <a href="https://sissource.ethz.ch/sispub/openbis/-/blob/master/lib-ro-crate/src/main/java/ch/eth/sis/rocrate/example/doc/QuickStart.java?ref_type=heads">Source of the example</a>
+</p>
+<code>
+
+import ch.eth.sis.rocrate.SchemaFacade;
+import ch.eth.sis.rocrate.facade.ISchemaFacade;
+import ch.eth.sis.rocrate.facade.LiteralType;
+import ch.eth.sis.rocrate.facade.PropertyType;
+import ch.eth.sis.rocrate.facade.Type;
+import edu.kit.datamanager.ro_crate.writer.FolderWriter;
+
+import java.util.List;
+import java.util.Map;
+
+public class QuickStart
+{
+
+    private static final String PREFIX = "";
+
+    private static final String SEPARATOR = ":";
+
+    public static void main(String[] args)
+    {
+        /* Setting up an RO-Crate with the schema facade */
+        ISchemaFacade schemaFacade =
+                new SchemaFacade("name", "description", "2024-12-04T07:53:11Z", "licenceIdentifier",
+                        Map.of());
+
+        Type personType = new Type();
+
+        {
+            personType.setId(PREFIX + SEPARATOR + "Person");
+            personType.setOntologicalAnnotations(List.of("https://schema.org/Person"));
+
+            {
+                PropertyType personId = new PropertyType();
+                personId.setId(PREFIX + SEPARATOR + "personid");
+                personId.setTypes(List.of(LiteralType.STRING));
+                personType.addProperty(personId);
+            }
+            {
+                PropertyType givenName = new PropertyType();
+                givenName.setId(PREFIX + SEPARATOR + "givenName");
+                givenName.setOntologicalAnnotations(List.of("https://schema.org/givenName"));
+                givenName.setTypes(List.of(LiteralType.STRING));
+                personType.addProperty(givenName);
+            }
+            {
+                PropertyType givenName = new PropertyType();
+                givenName.setId(PREFIX + SEPARATOR + "familyName");
+                givenName.setOntologicalAnnotations(List.of("https://schema.org/familyName"));
+                givenName.setTypes(List.of(LiteralType.STRING));
+                personType.addProperty(givenName);
+            }
+            {
+                PropertyType identifier = new PropertyType();
+                identifier.setId(PREFIX + SEPARATOR + "identifier");
+                identifier.setOntologicalAnnotations(List.of("https://schema.org/identifier"));
+                identifier.setTypes(List.of(LiteralType.STRING));
+                personType.addProperty(identifier);
+            }
+            schemaFacade.addType(personType);
+
+        }
+
+
+        /* Building our Experiment type */
+        {
+            Type experimentType = new Type();
+            experimentType.setId(PREFIX + SEPARATOR + "Experiment");
+
+            {
+                PropertyType experimentId = new PropertyType();
+                experimentId.setId(PREFIX + SEPARATOR + "experimentid");
+                experimentId.setTypes(List.of(LiteralType.STRING));
+                experimentType.addProperty(experimentId);
+            }
+            {
+                PropertyType creator = new PropertyType();
+                creator.setId(PREFIX + SEPARATOR + "creator");
+                creator.setOntologicalAnnotations(List.of("https://schema.org/creator"));
+                creator.addType(personType);
+                experimentType.addProperty(creator);
+            }
+            {
+                PropertyType name = new PropertyType();
+                name.setId(PREFIX + SEPARATOR + "name");
+                name.setTypes(List.of(LiteralType.STRING));
+                experimentType.addProperty(name);
+            }
+            {
+                PropertyType date = new PropertyType();
+                date.setId(PREFIX + SEPARATOR + "date");
+                date.setTypes(List.of(LiteralType.DATETIME));
+                experimentType.addProperty(date);
+            }
+            schemaFacade.addType(experimentType);
+
+        }
+
+        FolderWriter folderWriter = new FolderWriter();
+        folderWriter.save(schemaFacade.getCrate(), "/tmp/example-crate");
+
+    }
+
+}
+</code>
+
 
 <h2>Quick Start Guide (Python)</h2>
 
