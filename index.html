@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
-    <style>code {
-  display: block;
-  white-space: pre-wrap   
-}</style>
+<style>
+    code {
+        display: block;
+        white-space: pre-wrap
+    }
+</style>
 <h1>RO-Crate schema++</h1>
 
 <h2>Specification</h2>
@@ -28,18 +30,18 @@
 
 
 <h2>Use Cases</h2>
-<ul>
+<ol>
     <li>
-        Exchanging data between systems using a common format:
+        Exchanging metadata between systems using a common format (RO-Crate) but also a fully defined schema
+        (Interoperability Profile)
     </li>
     <li>
-        Semantic exchange of data: Sidestep the issue of !
+        Validation of imported metadata thanks to the well defined schema
     </li>
-
-    <li>
-        Validation of imported data: Validate the data! Trust things more!
+    <li>Go beyond using the ro-crate-metadata.json to include metadata, to support large exports. (Extensibility
+        Profile)
     </li>
-</ul>
+</ol>
 
 
 <h2>Quick Start Guide (Java)</h2>
@@ -66,22 +68,32 @@ CREATE TABLE experiment(
     FOREIGN KEY(creatorid) REFERENCES person(personid)
 );
 
+INSERT INTO PERSON (person_id, givenname, familyname, identifier) VALUES ('PERSON1', 'Meier', 'Andreas', 'https://orcid.org/0009-0002-6541-4637');
+INSERT INTO PERSON (person_id, givenname, familyname, identifier) VALUES ('PERSON2', 'Fuentes', 'Juan', 'https://orcid.org/0009-0002-8209-1999');
+
+
+INSERT INTO experiment (experimentid, date, name, creatorid) VALUES ('EXPERIMENT1', '2025-09-08 08:41:50', 'Example Experiment', 'Person1');
+
+
 </code></p>
 <p>
+    <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/quickstart.sql">SQL example code</a>
     Tables are Types in our nomenclature, e.g. <code>IType personType = new Type()</code>. Columns are PropertyTypes,
     e.g. <code>IPropertyType name = new PropertyType()</code>. Both Types and PropertyTypes can be annotated to specify
-    semantics. The metadata entries are represented by IMetaDataEntry, their <code>@type</code> is an IType specifed in the crate.
-    The above example looks like this. <a href="https://sissource.ethz.ch/sispub/openbis/-/blob/master/lib-ro-crate/src/main/java/ch/eth/sis/rocrate/example/doc/QuickStart.java?ref_type=heads">Source of the example</a>
+    semantics. The rows are represented by IMetaDataEntry, their <code>@type</code> is an IType specifed in
+    the crate.
+    The above example looks like this. <a
+        href="hhttps://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/Quickstart.java">Source
+        of the example</a>
 </p>
 <code>
 
 import ch.eth.sis.rocrate.SchemaFacade;
-import ch.eth.sis.rocrate.facade.ISchemaFacade;
-import ch.eth.sis.rocrate.facade.LiteralType;
-import ch.eth.sis.rocrate.facade.PropertyType;
-import ch.eth.sis.rocrate.facade.Type;
+import ch.eth.sis.rocrate.facade.*;
 import edu.kit.datamanager.ro_crate.writer.FolderWriter;
 
+import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -171,12 +183,43 @@ public class QuickStart
 
         }
 
+        {
+            MetadataEntry personAndreas = new MetadataEntry();
+            personAndreas.setId("PERSON1");
+            Map<String, Serializable> properties = new LinkedHashMap<>();
+            properties.put("givenname", "Andreas");
+            properties.put("lastname", "Meier");
+            properties.put("identifier", "https://orcid.org/0009-0002-6541-4637");
+            personAndreas.setProps(properties);
+            schemaFacade.addEntry(personAndreas);
+
+            MetadataEntry personJuan = new MetadataEntry();
+            personAndreas.setId("PERSON2");
+            Map<String, Serializable> properties2 = new LinkedHashMap<>();
+            properties2.put("givenname", "Andreas");
+            properties2.put("lastname", "Meier");
+            properties2.put("identifier", "https://orcid.org/0009-0002-6541-4637");
+            personAndreas.setProps(properties2);
+            schemaFacade.addEntry(personJuan);
+
+            MetadataEntry experiment1 = new MetadataEntry();
+            experiment1.setId("EXPERIMENT1");
+            experiment1.setReferences(Map.of("creator", List.of(personAndreas.getId())));
+            Map<String, Serializable> propertiesExperiment = new LinkedHashMap<>();
+            propertiesExperiment.put("name", "Example Experiment");
+            propertiesExperiment.put("date", "2025-09-08 08:41:50.000"); // ISO 8601
+            experiment1.setProps(propertiesExperiment);
+            schemaFacade.addEntry(experiment1);
+
+        }
+
         FolderWriter folderWriter = new FolderWriter();
         folderWriter.save(schemaFacade.getCrate(), "/tmp/example-crate");
 
     }
 
 }
+
 </code>
 
 
