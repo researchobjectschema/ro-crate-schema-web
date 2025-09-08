@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html>
-<style>
+    
+    <style>
     code {
         display: block;
         white-space: pre-wrap
     }
 </style>
+<head>
+<title>RO-Crate schema++</title>
+
+</head>
+
+<body>
 <h1>RO-Crate schema++</h1>
 
 <h2>Specification</h2>
@@ -36,7 +43,7 @@
         (Interoperability Profile)
     </li>
     <li>
-        Validation of imported metadata thanks to the well defined schema
+        Validation of imported metadata thanks to the well defined schema (Interoperability Profile)
     </li>
     <li>Go beyond using the ro-crate-metadata.json to include metadata, to support large exports. (Extensibility
         Profile)
@@ -48,7 +55,9 @@
 
 <p>In this example, we express two SQL tables in RO-Crate. It expresses experiments and each experiment can have a
     creator, who is a person</p>
-<p><code>
+<p></p>
+    <pre>
+    <code>
 CREATE TABLE person( -- https://schema.org/Person
     personid VARCHAR(255), 
     givenname VARCHAR(255), -- https://schema.org/givenName
@@ -75,7 +84,8 @@ INSERT INTO PERSON (person_id, givenname, familyname, identifier) VALUES ('PERSO
 INSERT INTO experiment (experimentid, date, name, creatorid) VALUES ('EXPERIMENT1', '2025-09-08 08:41:50', 'Example Experiment', 'Person1');
 
 
-</code></p>
+</code>
+</pre>
 <p>
     <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/quickstart.sql">SQL example code</a>
     Tables are Types in our nomenclature, e.g. <code>IType personType = new Type()</code>. Columns are PropertyTypes,
@@ -86,6 +96,7 @@ INSERT INTO experiment (experimentid, date, name, creatorid) VALUES ('EXPERIMENT
         href="hhttps://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/Quickstart.java">Source
         of the example</a>
 </p>
+<pre>
 <code>
 
 import ch.eth.sis.rocrate.SchemaFacade;
@@ -221,10 +232,11 @@ public class QuickStart
 }
 
 </code>
+</pre>
 
 
 <h2>Quick Start Guide (Python)</h2>
 
-
+</body>
 
 </html>
