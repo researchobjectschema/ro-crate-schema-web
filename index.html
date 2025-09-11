@@ -99,21 +99,56 @@
     <p>+ Convention for interoperable schema and metadata.</p>
     <p>+ Convention to include interoperable schema and metadata outside ro-crate-metadata.json.</p>
 </div>
+    <h2>Specification</h2>
+    <p>Same old RO-Crate</p>
+    <ul>
+        <li>+ convention for interoperable schema for metadata</li>
+        <li>+ convention for extensible ro-crate-metadata.json</li>
+    </ul>
+
+    <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">Interopberability</a>
+
+    <a href="https://github.com/researchobjectschema/ro-crate-extensibility-profile">Extensibility</a>
+
+    <h2>Libraries</h2>
+
+    <ul>
+        <li><a class="fa-github"
+                href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">&#xf09b
+                Java reference implementation</a></li>
+        <li><a class="fa-github"
+                href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">&#xf09b
+                Python</a></li>
+    </ul>
 
 
-<h2>Use Cases</h2>
-<ol>
-    <li>
-        Exchanging metadata between systems using a common format (RO-Crate) but also a fully defined schema
-        (Interoperability Profile)
-    </li>
-    <li>
-        Validation of imported metadata thanks to the well defined schema (Interoperability Profile)
-    </li>
-    <li>Go beyond using the ro-crate-metadata.json to include metadata, to support large exports. (Extensibility
-        Profile)
-    </li>
-</ol>
+    <h2>Use Cases</h2>
+    <ol>
+        <li>
+            Exchanging metadata between systems using a common format (RO-Crate) but also a fully defined schema
+            (Interoperability Profile)
+        </li>
+        <li>
+            Validation of imported metadata thanks to the well defined schema (Interoperability Profile)
+        </li>
+        <li>Go beyond using the ro-crate-metadata.json to include metadata, to support large exports. (Extensibility
+            Profile)
+        </li>
+    </ol>
+
+    <h2>Examples</h2>
+
+    These examples illustrate usage of our profiles, with sample usage code if available.
+
+    <h3>Extensibility</h2>
+
+        <p>There are no libraries available. Examples of a draft of the extension format can be found for <a
+                href="https://github.com/researchobjectschema/ro-crate-extensibility-profile/tree/main/0.1.x/examples/serialization-formats/csvw">CSVW</a>
+            and <a
+                href="https://github.com/researchobjectschema/ro-crate-extensibility-profile/tree/main/0.1.x/examples/serialization-formats/rdf-json">OO-LD</a>.
+            They are based on an openBIS <a
+                href="https://github.com/researchobjectschema/ro-crate-extensibility-profile/tree/main/0.1.x/examples/openbis-reference-export">reference
+                export</a></p>
 
 <h2>Specifications</h2>
 
@@ -130,13 +165,19 @@
 <p><i class="fontello-icon">&#xf09b</i>  <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">Java</a> (reference implementation)</p>
 <p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">Python</a></p>
 
-<h2>Quick Start Guide (Java)</h2>
+        <h3>Interoperability Quick Start Guide (Java)</h2>
 
 <p>In this example, we express two SQL tables in RO-Crate. It expresses experiments and each experiment can have a creator, who is a person.</p>
 
 <pre>
 <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/quickstart.sql">SQL example source</a>
 <code class="language-sql">
+            <p>In this example, we express two SQL tables in RO-Crate. It expresses experiments and each experiment can
+                have a
+                creator, who is a person</p>
+            <p></p>
+            <pre>
+    <code>
 CREATE TABLE person( -- https://schema.org/Person
     personid VARCHAR(255), 
     givenname VARCHAR(255), -- https://schema.org/givenName
@@ -178,6 +219,22 @@ The rows are represented by IMetaDataEntry, their IType is specifed in the crate
 <pre>
 <a href="hhttps://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/Quickstart.java">Java example source</a>
 <code class="language-java">
+            <p>
+                <a
+                    href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/quickstart.sql">SQL
+                    example code</a>
+                Tables are Types in our nomenclature, e.g. <code>IType personType = new Type()</code>. Columns are
+                PropertyTypes,
+                e.g. <code>IPropertyType name = new PropertyType()</code>. Both Types and PropertyTypes can be annotated
+                to specify
+                semantics. The rows are represented by IMetaDataEntry, their <code>@type</code> is an IType specifed in
+                the crate.
+                The above example looks like this. <a
+                    href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/Quickstart.java">Source
+                    of the example</a>
+            </p>
+            <pre>
+<code>
 
 import ch.eth.sis.rocrate.SchemaFacade;
 import ch.eth.sis.rocrate.facade.*;
@@ -315,7 +372,7 @@ public class QuickStart
 </pre>
 
 
-<h2>Quick Start Guide (Python)</h2>
+            <h2>Quick Start Guide (Python)</h2>
 
 </body>
 
