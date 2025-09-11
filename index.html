@@ -65,6 +65,17 @@
         margin-left:50%;
     }
 
+    footer {
+        text-align:center;
+        padding-top: 2em;
+        padding-bottom: 2em;
+        background-color: #fafafa;
+    }
+
+    .footer-org {
+        margin-right: 10%;
+    }
+
     code {
         display: block;
         white-space: pre-wrap
@@ -81,7 +92,7 @@
 </head>
 
 <body>
-<h1>RO-Crate schema++</h1>
+<h1>RO-Crate schema+</h1>
 
 <div class="h1-subtitle">
     <p>Same RO-Crate</p>
@@ -105,8 +116,14 @@
 </ol>
 
 <h2>Specifications</h2>
-<p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile">Interoperability Profile</a> (Supported by libraries)</p>
-<p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-extensibility-profile">Extensibility Profile</a> (Draft)</p>
+
+<h3>Profiles</h3>
+<p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/spec.md">Interoperability Profile</a> (Currently being implemented by openBIS, SciCat, SciLog and AiiDAlab)</p>
+<p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-extensibility-profile/blob/main/0.1.x/spec.md">Extensibility Profile</a> (Draft)</p>
+
+<h3>Programming API</h3>
+<p><i class="fontello-icon">&#xf09b</i> <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/spec.md#api">Client API to read/write schema and metadata on crates</a>  (Libraries for Java and Javascript available)<p>
+<p><i class="fontello-icon">&#xf09b</i> Server API for exports and imports (Currently being implemented by openBIS, SciCat, SciLog and AiiDAlab)<p>
 
 <h2>Libraries</h2>
 
@@ -302,4 +319,8 @@ public class QuickStart
 
 </body>
 
+<footer>
+<h2>Sponsored by ETHZ ORD program</h2>
+<span class="footer-org">ETHZ Scientific IT Services</span><span class="footer-org">PSI</span><span class="footer-org">EMPA</span>
+</footer>
 </html>
