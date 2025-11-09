@@ -685,6 +685,52 @@ for prop in properties:
 </code>
 </pre>
 
+<h3>Minimal Pydantic Example</h3>
+<p>Optionally you can create a RO-Crate using Pydantic models with the decorator-based approach. 
+For a complete example with complex scientific workflows, object relationships, and round-trip import/export, 
+see the <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/lib-ro-crate-schema/examples/full_example.py">full example</a>.</p>
+
+<pre>
+<a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/minimal_pydantic_example.py">Minimal Pydantic example source</a>
+<code class="language-python">
+from pydantic import BaseModel
+from lib_ro_crate_schema.crate.decorators import ro_crate_schema, Field
+from lib_ro_crate_schema.crate.schema_facade import SchemaFacade
+from lib_ro_crate_schema.crate.jsonld_utils import add_schema_to_crate
+from rocrate.rocrate import ROCrate
+from pathlib import Path
+
+
+# Define a simple Person schema
+@ro_crate_schema(ontology="https://schema.org/Person")
+class Person(BaseModel):
+    """Person entity in the RO-Crate"""
+    name: str = Field(json_schema_extra={"ontology": "https://schema.org/name"})
+    email: str = Field(json_schema_extra={"ontology": "https://schema.org/email"})
+
+
+# Create a Person instance
+person = Person(name="Alice Researcher", email="alice@example.org")
+
+# Build RO-Crate
+facade = SchemaFacade()
+facade.add_all_registered_models()
+facade.add_model_instance(person, "alice")
+
+# Create and export RO-Crate
+crate = ROCrate()
+crate.name = "Minimal Example"
+crate.description = "A minimal RO-Crate with one Person"
+
+final_crate = add_schema_to_crate(facade, crate)
+output_path = Path("output_crates/minimal_example")
+output_path.mkdir(parents=True, exist_ok=True)
+final_crate.write(output_path)
+
+print(f"✓ RO-Crate exported to: {output_path}")
+</code>
+</pre>
+
 </body>
 
 <footer>
