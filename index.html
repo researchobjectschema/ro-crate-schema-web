@@ -208,11 +208,11 @@
     <td class="table-cell-left">Reference implementation</td>
   </tr>
   <tr>
-    <td class="table-cell-left">Python</td>
-    <td>Active Development</td>
+    <td class="table-cell-left"><a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/tree/main/0.2.x/lib/python">Python</a></td>
+    <td>Release Candidate</td>
+    <td><a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/releases"><i class="fontello-icon">&#xf09b</i> 0.2</a></td>
     <td></td>
-    <td></td>
-    <td class="table-cell-left"></td>
+    <td class="table-cell-left">Python implementation with Pydantic support</td>
   </tr>
 </tbody>
 </table>
@@ -500,10 +500,241 @@ public class QuickStartRead
 </code>
 </pre>
 
+<h2>Quick Start Guide (Python)</h2>
+
+<p>In this example, we express two SQL tables in RO-Crate using Python. It expresses experiments and each experiment can have a creator, who is a person.</p>
+
+<pre>
+<a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/examples/quickstart/quickstart.sql">SQL example source</a>
+<code class="language-sql">
+CREATE TABLE person( -- https://schema.org/Person
+    personid VARCHAR(255), 
+    givenname VARCHAR(255), -- https://schema.org/givenName
+    familyname VARCHAR(255), -- https://schema.org/familyName
+    identifier VARCHAR (255), -- https://schema.org/identifier
+    PRIMARY KEY(personid)
+
+
+);
+
+CREATE TABLE experiment(
+    experimentid VARCHAR(255), 
+    date DATETIME,
+    name VARCHAR(255),
+    creatorid VARCHAR(255), https://schema.org/creator
+    PRIMARY_KEY(experimentid),
+    FOREIGN KEY(creatorid) REFERENCES person(personid)
+);
+
+INSERT INTO PERSON (person_id, givenname, familyname, identifier) VALUES ('PERSON1', 'Meier', 'Andreas', 'https://orcid.org/0009-0002-6541-4637');
+INSERT INTO PERSON (person_id, givenname, familyname, identifier) VALUES ('PERSON2', 'Fuentes', 'Juan', 'https://orcid.org/0009-0002-8209-1999');
+
+
+INSERT INTO experiment (experimentid, date, name, creatorid) VALUES ('EXPERIMENT1', '2025-09-08 08:41:50', 'Example Experiment', 'Person1');
+
+
+</code>
+</pre>
+<p>
+Tables are Types in our nomenclature, e.g. 
+<pre><code class="language-python">personType = Type(id="id")</code></pre>
+Columns are PropertyTypes, e.g. 
+<pre><code class="language-python">name = TypeProperty(id="id")</code></pre>
+Both Types and PropertyTypes can be annotated to specify semantics. 
+The rows are represented by MetadataEntry, their Type is specified in the crate.
+</p>
+
+<h3>Write Ro-Crate Example</h3>
+<pre>
+<a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/lib-ro-crate-schema/examples/python_quickstart_write.py">Python example source</a>
+<code class="language-python">
+from lib_ro_crate_schema.crate.schema_facade import SchemaFacade
+from lib_ro_crate_schema.crate.type import Type
+from lib_ro_crate_schema.crate.type_property import TypeProperty
+from lib_ro_crate_schema.crate.metadata_entry import MetadataEntry
+from lib_ro_crate_schema.crate.literal_type import LiteralType
+
+TMP_EXAMPLE_CRATE = "output_crates/example-crate"
+
+# Setting up an RO-Crate with the schema facade
+schemaFacade = SchemaFacade()
+
+personType = Type(id="id")
+
+# Building Person type
+personType.setId("Person")
+personType.setOntologicalAnnotations(["https://schema.org/Person"])
+
+personId = TypeProperty(id="id")
+personId.setId("personid")
+personId.setTypes([LiteralType.STRING])
+personType.addProperty(personId)
+
+givenName = TypeProperty(id="id")
+givenName.setId("givenName")
+givenName.setOntologicalAnnotations(["https://schema.org/givenName"])
+givenName.setTypes([LiteralType.STRING])
+personType.addProperty(givenName)
+
+familyName = TypeProperty(id="id")
+familyName.setId("familyName")
+familyName.setOntologicalAnnotations(["https://schema.org/familyName"])
+familyName.setTypes([LiteralType.STRING])
+personType.addProperty(familyName)
+
+identifier = TypeProperty(id="id")
+identifier.setId("identifier")
+identifier.setOntologicalAnnotations(["https://schema.org/identifier"])
+identifier.setTypes([LiteralType.STRING])
+personType.addProperty(identifier)
+
+schemaFacade.addType(personType)
+
+# Building Experiment type
+experimentType = Type(id="id")
+experimentType.setId("Experiment")
+
+experimentId = TypeProperty(id="id")
+experimentId.setId("experimentid")
+experimentId.setTypes([LiteralType.STRING])
+experimentType.addProperty(experimentId)
+
+creator = TypeProperty(id="id")
+creator.setId("creator")
+creator.setOntologicalAnnotations(["https://schema.org/creator"])
+creator.addType(personType)
+experimentType.addProperty(creator)
+
+name = TypeProperty(id="id")
+name.setId("name")
+name.setTypes([LiteralType.STRING])
+experimentType.addProperty(name)
+
+date = TypeProperty(id="id")
+date.setId("date")
+date.setTypes([LiteralType.DATETIME])
+experimentType.addProperty(date)
+
+schemaFacade.addType(experimentType)
+
+# Creating metadata entries
+personAndreas = MetadataEntry(id="id", class_id="id")
+personAndreas.setId("PERSON1")
+personAndreas.setClassId(personType.getId())
+properties = {}
+properties["givenname"] = "Andreas"
+properties["lastname"] = "Meier"
+properties["identifier"] = "https://orcid.org/0009-0002-6541-4637"
+personAndreas.setProperties(properties)
+personAndreas.setReferences({})
+schemaFacade.addEntry(personAndreas)
+
+personJuan = MetadataEntry(id="id", class_id="id")
+personJuan.setId("PERSON2")
+personJuan.setClassId(personType.getId())
+properties2 = {}
+properties2["givenname"] = "Juan"
+properties2["lastname"] = "Meier"
+properties2["identifier"] = "https://orcid.org/0009-0002-6541-4637"
+personJuan.setProperties(properties2)
+personJuan.setReferences({})
+schemaFacade.addEntry(personJuan)
+
+experiment1 = MetadataEntry(id="id", class_id="id")
+experiment1.setId("EXPERIMENT1")
+experiment1.setClassId(experimentType.getId())
+experiment1.setReferences({"creator": [personAndreas.getId()]})
+propertiesExperiment = {}
+propertiesExperiment["name"] = "Example Experiment"
+propertiesExperiment["date"] = "2025-09-08 08:41:50.000"
+experiment1.setProperties(propertiesExperiment)
+schemaFacade.addEntry(experiment1)
+
+# Write to file
+schemaFacade.write(TMP_EXAMPLE_CRATE, name="Python QuickStart Example")
+</code>
+</pre>
+
+<h3>Read RO-Crate Example</h3>
+<pre>
+<a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/lib-ro-crate-schema/examples/python_quickstart_read.py">Python example source</a>
+<code class="language-python">
+from lib_ro_crate_schema.crate.schema_facade import SchemaFacade
+
+TMP_EXAMPLE_CRATE = "output_crates/example-crate"
+
+# Load RO-Crate from directory
+schemaFacade = SchemaFacade.from_ro_crate(TMP_EXAMPLE_CRATE)
+
+# Display types
+types = schemaFacade.getTypes()
+
+print("📚 Types in the crate:")
+for typeObj in types:
+    print(f"- Type {typeObj.getId()}: {typeObj.getComment() if typeObj.getComment() else ''}")
+    entries = schemaFacade.getEntries(typeObj.getId())
+
+    for entry in entries:
+        print(f"{entry.getId()} ({entry.getClassId()}): {entry.properties}")
+
+# Display property types
+print("📚 Properties in the crate:")
+properties = schemaFacade.getPropertyTypes()
+for prop in properties:
+    print(f"{prop.getId()}: {prop.getComment() if prop.getComment() else ''} Range: {prop.getRange()}")
+</code>
+</pre>
+
+<h3>Minimal Pydantic Example</h3>
+<p>Optionally you can create a RO-Crate using Pydantic models with the decorator-based approach. 
+For a complete example with complex scientific workflows, object relationships, and round-trip import/export, 
+see the <a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/lib-ro-crate-schema/examples/full_example.py">full example</a>.</p>
+
+<pre>
+<a href="https://github.com/researchobjectschema/ro-crate-interoperability-profile/blob/main/0.2.x/lib/python/minimal_pydantic_example.py">Minimal Pydantic example source</a>
+<code class="language-python">
+from pydantic import BaseModel
+from lib_ro_crate_schema.crate.decorators import ro_crate_schema, Field
+from lib_ro_crate_schema.crate.schema_facade import SchemaFacade
+from lib_ro_crate_schema.crate.jsonld_utils import add_schema_to_crate
+from rocrate.rocrate import ROCrate
+from pathlib import Path
+
+
+# Define a simple Person schema
+@ro_crate_schema(ontology="https://schema.org/Person")
+class Person(BaseModel):
+    """Person entity in the RO-Crate"""
+    name: str = Field(json_schema_extra={"ontology": "https://schema.org/name"})
+    email: str = Field(json_schema_extra={"ontology": "https://schema.org/email"})
+
+
+# Create a Person instance
+person = Person(name="Alice Researcher", email="alice@example.org")
+
+# Build RO-Crate
+facade = SchemaFacade()
+facade.add_all_registered_models()
+facade.add_model_instance(person, "alice")
+
+# Create and export RO-Crate
+crate = ROCrate()
+crate.name = "Minimal Example"
+crate.description = "A minimal RO-Crate with one Person"
+
+final_crate = add_schema_to_crate(facade, crate)
+output_path = Path("output_crates/minimal_example")
+output_path.mkdir(parents=True, exist_ok=True)
+final_crate.write(output_path)
+
+print(f"✓ RO-Crate exported to: {output_path}")
+</code>
+</pre>
+
 </body>
 
 <footer>
 <h2>Sponsored by ETHZ ORD program</h2>
-<span class="footer-org">ETHZ Scientific IT Services</span><span class="footer-org">PSI</span><span class="footer-org">EMPA</span>
+<span class="footer-org">ETHZ Scientific IT Services</span><span class="footer-org">PSI</span><span class="footer-org"><a href="https://scientificit.empa.ch">Empa</a></span>
 </footer>
 </html>
